@@ -1,13 +1,15 @@
 import os
+from decouple import config, Csv
+from dj_database_url import parse as dburl
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-#_esw^an0kkb@d0^-xql3g2$_1h-rj+k^3v@rtb03=f@*uvp=%'
+SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
 
 
 INSTALLED_APPS = [
@@ -17,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 
     'apps.empresas',
     'apps.funcionarios',
@@ -57,11 +60,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestao_rh.wsgi.application'
 
 
+default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default':config('DATABASE_URL', default=default_dburl, cast=dburl)
 }
 
 
@@ -93,10 +94,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_REDIRECT_URL = 'home'
 
